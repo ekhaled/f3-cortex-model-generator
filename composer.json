@@ -1,0 +1,21 @@
+{
+    "name": "ekhaled/f3-cortex-model-generator",
+    "description": "Generates F3 Cortex models by reverse engineering existing database schema",
+    "keywords": ["mysql","schema","model", "model-generator", "f3", "cortex", "fatfree"],
+    "homepage": "https://github.com/ekhaled/schema-parser-mysql",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.6",
+        "ext-pdo" : "*",
+        "ekhaled/schema-parser-mysql": "1.0"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    },
+    "authors": [
+        {
+            "name": "ekhaled",
+            "email": "me.khaled@gmail.com"
+        }
+    ]
+}
