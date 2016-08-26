@@ -1,7 +1,7 @@
 <?php
 namespace Ekhaled\Generators\MySQL;
 
-use \Exception;
+use \RuntimeException;
 use \PDOException;
 
 class Model{
@@ -31,7 +31,7 @@ class Model{
 
         try{
             $this->checkConditions();
-        }catch(Exception $ex){
+        }catch(RuntimeException $ex){
             $message = $ex->getMessage();
             $this->output($message, true);
             exit;
@@ -80,11 +80,11 @@ Please ensure database connection settings are correct.", true);
         $config = $this->config;
 
         if (!class_exists('\Ekhaled\MysqlSchema\Parser')) {
-            throw new Exception('This generator depends on ekhaled/schema-parser-mysql, please ensure that package is loaded');
+            throw new RuntimeException('This generator depends on ekhaled/schema-parser-mysql, please ensure that package is loaded');
         }
 
         if (empty($config['output']) || !(file_exists($config['output']) && is_dir($config['output']) && is_writable($config['output']))) {
-            throw new Exception('Please ensure that the output folder exists and is writable.');
+            throw new RuntimeException('Please ensure that the output folder exists and is writable.');
         }
     }
 
