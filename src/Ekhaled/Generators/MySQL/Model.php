@@ -15,9 +15,9 @@ class Model{
         $defaults = array(
             'output'            => 'path/to/output/folder',
             'DB'                => array(),
-            'namespace'         => 'Models\Base',
+            'namespace'         => 'Models\\Base',
             'extends'           => '\\Models\\Base',
-            'relationNamespace' => '\Models\Base\\',
+            'relationNamespace' => '\\Models\Base\\',
             'template'          => '',
             'exclude'           => array()
         );
