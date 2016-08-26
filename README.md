@@ -1,5 +1,5 @@
 # F3 Cortex model generator
-Generates F3 Cortex models by reverse engineering existing database schema.
+Generates [F3 Cortex](https://github.com/ikkez/f3-cortex) models by reverse engineering existing database schema.
 
 **Currently only supports MySQL.**
 
