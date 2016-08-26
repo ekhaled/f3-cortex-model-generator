@@ -1,6 +1,9 @@
 <?php
 namespace Ekhaled\Generators\MySQL;
 
+use \Exception;
+use \PDOException;
+
 class Model{
 
     protected $config = array();
@@ -25,11 +28,29 @@ class Model{
 
         //store the config back into the class property
         $this->config = $defaults;
+
+        try{
+            $this->checkConditions();
+        }catch(Exception $ex){
+            $message = $ex->getMessage();
+            $this->output($message, true);
+            exit;
+        }
+
     }
 
     public function generate()
     {
-        $schema = $this->getSchema();
+        try{
+            $schema = $this->getSchema();
+        }catch(PDOException $ex){
+            $message = $ex->getMessage();
+            $this->output("Database connection failed with the message
+>> \"" . $message . "\"
+Please ensure database connection settings are correct.", true);
+            exit;
+        }
+
         $config = $this->config;
 
         foreach($schema as $table){
@@ -52,6 +73,19 @@ class Model{
             }
         }
 
+    }
+
+    protected function checkConditions()
+    {
+        $config = $this->config;
+
+        if (!class_exists('\Ekhaled\MysqlSchema\Parser')) {
+            throw new Exception('This generator depends on ekhaled/schema-parser-mysql, please ensure that package is loaded');
+        }
+
+        if (empty($config['output']) || !(file_exists($config['output']) && is_dir($config['output']) && is_writable($config['output']))) {
+            throw new Exception('Please ensure that the output folder exists and is writable.');
+        }
     }
 
     protected function generateModel($schema, $namespace = null, $extends = null, $relationNamespace = '',$classname = null)
