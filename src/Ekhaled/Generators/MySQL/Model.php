@@ -6,17 +6,20 @@ use \PDOException;
 
 class Model{
 
+    private $_template;
+
     protected $config = array();
 
     public function __construct($config = array())
     {
         $defaults = array(
-            'output'    => 'path/to/output/folder',
-            'DB'        => array(),
-            'namespace' => 'Models\Base',
-            'extends'   => '\\Models\\Base',
+            'output'            => 'path/to/output/folder',
+            'DB'                => array(),
+            'namespace'         => 'Models\Base',
+            'extends'           => '\\Models\\Base',
             'relationNamespace' => '\Models\Base\\',
-            'exclude' => array()
+            'template'          => '',
+            'exclude'           => array()
         );
 
         foreach ($config as $key => $value) {
@@ -29,6 +32,7 @@ class Model{
         //store the config back into the class property
         $this->config = $defaults;
 
+        clearstatcache();
         try{
             $this->checkConditions();
         }catch(RuntimeException $ex){
@@ -86,6 +90,12 @@ Please ensure database connection settings are correct.", true);
         if (empty($config['output']) || !(file_exists($config['output']) && is_dir($config['output']) && is_writable($config['output']))) {
             throw new RuntimeException('Please ensure that the output folder exists and is writable.');
         }
+
+        if (!empty($this->config['template'])) {
+            if (!(file_exists($this->config['template']) && is_file($this->config['template']))) {
+                throw new RuntimeException("The specified template file does not exist.\nPlease leave the `template` option empty if you would like to use the built-in template.");
+            }
+        }
     }
 
     protected function generateModel($schema, $namespace = null, $extends = null, $relationNamespace = '',$classname = null)
@@ -135,7 +145,11 @@ Please ensure database connection settings are correct.", true);
 
     protected function getTemplate()
     {
-        return <<<PHP
+        if (empty($this->_template)) {
+            if (!empty($this->config['template'])) {
+                $this->_template = file_get_contents($this->config['template']);
+            } else {
+                $this->_template = <<<PHP
 <?php
 {{NAMESPACE}}
 
@@ -149,6 +163,10 @@ class {{CLASSNAME}} {{EXTENDS}}
 
 }
 PHP;
+            }
+        }
+
+        return $this->_template;
     }
 
     protected function getSchema()
