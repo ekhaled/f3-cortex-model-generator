@@ -3,7 +3,7 @@ namespace Ekhaled\Generators\MySQL;
 
 class Model{
 
-    private $config = array();
+    protected $config = array();
 
     public function __construct($config = array())
     {
@@ -54,7 +54,7 @@ class Model{
 
     }
 
-    private function generateModel($schema, $namespace = null, $extends = null, $relationNamespace = '',$classname = null)
+    protected function generateModel($schema, $namespace = null, $extends = null, $relationNamespace = '',$classname = null)
     {
         $modelTemplate = $this->getTemplate();
 
@@ -99,7 +99,7 @@ class Model{
 
     }
 
-    private function getTemplate()
+    protected function getTemplate()
     {
         return <<<PHP
 <?php
@@ -117,17 +117,17 @@ class {{CLASSNAME}} {{EXTENDS}}
 PHP;
     }
 
-    private function getSchema()
+    protected function getSchema()
     {
         $schemaParser = new \Ekhaled\MysqlSchema\Parser($this->config['DB']);
         return $schemaParser->getSchema();
     }
 
-    private function className($t, $ns = ''){
+    protected function className($t, $ns = ''){
         return $ns.ucfirst(strtolower($t));
     }
 
-    private function field(array $field, $relationNamespace = ''){
+    protected function field(array $field, $relationNamespace = ''){
         $template = '        \''.$field['name'].'\' => [
 {{VALUES}}
         ]';
@@ -154,7 +154,7 @@ PHP;
         return $template;
     }
 
-    private function virtualfield(array $relation, $relationNamespace = ''){
+    protected function virtualfield(array $relation, $relationNamespace = ''){
         if(isset($relation['via'])){
             return '        \''.$relation['selfColumn'].'\' => [
                 \''.$relation['type'].'\' => [\''.$this->className($relation['table'], $relationNamespace).'\', \''.$relation['column'].'\', \''.$relation['via'].'\']
@@ -167,7 +167,7 @@ PHP;
 
     }
 
-    private function extractType($dbType){
+    protected function extractType($dbType){
 
         $ints = [1,2,4,8];
         $varchars = [128, 256, 512];
@@ -212,7 +212,7 @@ PHP;
         return $type;
     }
 
-    private function output($msg, $err = false){
+    protected function output($msg, $err = false){
         if($err){
             echo "\033[1;97;41m" .$msg."\e[0m" . "\n";
         }else{
