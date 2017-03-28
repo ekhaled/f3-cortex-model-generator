@@ -13,14 +13,15 @@ class Model{
     public function __construct($config = array())
     {
         $defaults = array(
-            'output'            => 'path/to/output/folder',
-            'DB'                => array(),
-            'namespace'         => 'Models\\Base',
-            'extends'           => '\\Models\\Base',
-            'relationNamespace' => '\\Models\Base\\',
-            'template'          => '',
-            'exclude_views'     => false,
-            'exclude'           => array()
+            'output'                => 'path/to/output/folder',
+            'DB'                    => array(),
+            'namespace'             => 'Models\\Base',
+            'extends'               => '\\Models\\Base',
+            'relationNamespace'     => '\\Models\Base\\',
+            'template'              => '',
+            'exclude_views'         => false,
+            'exclude_connectors'    => true,
+            'exclude'               => array()
         );
 
         foreach ($config as $key => $value) {
@@ -61,6 +62,9 @@ Please ensure database connection settings are correct.", true);
         foreach($schema as $table){
             if(!in_array($table['name'], $config['exclude'])){
                 if($config['exclude_views'] && $table['type'] == 'VIEW'){
+                    continue;
+                }
+                if($config['exclude_connectors'] && $table['is_connector_table']){
                     continue;
                 }
                 $className = $this->className($table['name']);
