@@ -19,6 +19,7 @@ class Model{
             'extends'           => '\\Models\\Base',
             'relationNamespace' => '\\Models\Base\\',
             'template'          => '',
+            'exclude_views'     => false,
             'exclude'           => array()
         );
 
@@ -59,6 +60,9 @@ Please ensure database connection settings are correct.", true);
 
         foreach($schema as $table){
             if(!in_array($table['name'], $config['exclude'])){
+                if($config['exclude_views'] && $table['type'] == 'VIEW'){
+                    continue;
+                }
                 $className = $this->className($table['name']);
                 $h = fopen($config['output'].$className.'.php' , 'w');
                 if(fwrite($h, $this->generateModel(
