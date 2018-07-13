@@ -229,7 +229,20 @@ PHP;
 
     protected function extractType($dbType){
 
-        $ints = [4 => 1 , 6 => 2 , 11 => 4, 20 => 8];
+        $ints = [
+            1 => 1,
+            2 => 1,
+            3 => 1,
+            4 => 1,
+            5 => 2,
+            6 => 2,
+            7 => 2,
+            8 => 4,
+            9 => 4,
+            10 => 4,
+            11 => 4,
+            20 => 8
+        ];
         $varchars = [128, 256, 512];
 
         $size = null;
@@ -265,8 +278,12 @@ PHP;
             return 'VARCHAR128';
         }
 
-        if($type == 'INT' && in_array($size, array_keys($ints))){
-            return $type . $ints[$size];
+        if($type == 'INT'){
+            if(in_array($size, array_keys($ints))){
+                return $type . $ints[$size];
+            }else{
+                return $type . '8';
+            }
         }
 
         return $type;
