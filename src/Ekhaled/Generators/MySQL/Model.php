@@ -220,7 +220,7 @@ PHP;
                 \''.$relation['type'].'\' => [\''.$this->className($relation['table'], $relationNamespace).'\', \''.$relation['column'].'\', \''.$relation['via'].'\']
             ]';
         }else{
-            return '        \''.$relation['table'].'\' => [
+            return '        \''.(isset($relation['key']) ? $relation['key'] : $relation['table']).'\' => [
             \''.$relation['type'].'\' => [\''.$this->className($relation['table'], $relationNamespace).'\', \''.$relation['column'].'\']
         ]';
         }
