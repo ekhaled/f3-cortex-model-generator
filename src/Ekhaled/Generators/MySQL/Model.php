@@ -200,8 +200,8 @@ PHP;
 
             $values[] = '\'type\' => \''.$this->extractType($field['type']).'\'';
 
-            if(!empty($field['default'])){
-                $values[] = '\'default\' => \''.$field['default'].'\'';
+            if (trim($field['default']) !== '') {
+                $values[] = '\'default\' => \'' . $field['default'] . '\'';
             }
 
             $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
