@@ -7,6 +7,7 @@ use \PDOException;
 class Model{
 
     private $_template;
+    private $_fieldconf_template;
 
     protected $config = array();
 
@@ -224,11 +225,11 @@ PHP;
             $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
         }
 
-        $template = str_replace('{{VALUES}}', implode(",\n", array_map(function($val){
-            return '            '.$val;
-        }, $values)), $template);
+        $fieldConfTemplate = str_replace('{{VALUES}}', implode(",\n", array_map(function($val){
+            return $val;
+        }, $values)), $fieldConfTemplate);
 
-        return $template;
+        return $fieldConfTemplate;
     }
 
     protected function virtualfield(array $relation, $relationNamespace = ''){
