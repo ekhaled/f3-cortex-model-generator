@@ -67,3 +67,5 @@ Supported placeholders are:
  - `{{EXTENDS}}`
  - `{{FIELDCONF}}`
  - `{{TABLENAME}}`
+
+TODO - Add support for custom templates for fieldconf.
