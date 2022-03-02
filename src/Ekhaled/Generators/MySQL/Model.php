@@ -178,6 +178,23 @@ PHP;
         return $this->_template;
     }
 
+    protected function getFieldConfTemplate()
+    {
+        if (empty($this->_fieldconf_template)) {
+            if (!empty($this->config['fieldconf_template'])) {
+                $this->_fieldconf_template = file_get_contents($this->config['fieldconf_template']);
+            } else {
+                $this->_fieldconf_template = <<<PHP
+'{{FIELDNAME}}' => [
+  {{VALUES}}
+]
+PHP;
+            }
+        }
+
+        return $this->_fieldconf_template;
+    }
+
     protected function getSchema()
     {
         $schemaParser = new \Ekhaled\MysqlSchema\Parser($this->config['DB']);
