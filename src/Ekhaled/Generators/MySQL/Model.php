@@ -206,9 +206,8 @@ PHP;
     }
 
     protected function field(array $field, $relationNamespace = ''){
-        $template = '        \''.$field['name'].'\' => [
-{{VALUES}}
-        ]';
+        $fieldConfTemplate = $this->getFieldConfTemplate();
+        $fieldConfTemplate = str_replace('{{FIELDNAME}}', $field['name'], $fieldConfTemplate);
 
         $values = [];
 
