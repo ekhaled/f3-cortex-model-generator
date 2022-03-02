@@ -18,13 +18,14 @@ Create an executable PHP file with the following contents
 require_once(__DIR__ . '/../src/vendor/autoload.php');
 
 $config = [
-    'output'            => 'path/to/output/folder/',
-    'DB'                => array(), //DB connection params
-    'namespace'         => 'Models\\Base',
-    'extends'           => '\\Models\\Base',
-    'relationNamespace' => '\\Models\Base\\',
-    'template'          => 'path/to/template/file',
-    'exclude'           => array()
+    'output'             => 'path/to/output/folder/',
+    'DB'                 => array(), //DB connection params
+    'namespace'          => 'Models\\Base',
+    'extends'            => '\\Models\\Base',
+    'relationNamespace'  => '\\Models\Base\\',
+    'template'           => 'path/to/template/file',
+    'fieldconf_template' => 'path/to/template/file',
+    'exclude'            => array()
 ];
 
 $generator = new \Ekhaled\Generators\MySQL\Model($config);
