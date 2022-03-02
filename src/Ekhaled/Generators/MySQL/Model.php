@@ -19,6 +19,7 @@ class Model{
             'extends'               => '\\Models\\Base',
             'relationNamespace'     => '\\Models\Base\\',
             'template'              => '',
+            'fieldconf_template'    => '',
             'exclude_views'         => false,
             'exclude_connectors'    => true,
             'exclude'               => array()
