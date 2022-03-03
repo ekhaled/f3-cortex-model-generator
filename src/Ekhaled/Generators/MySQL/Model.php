@@ -225,8 +225,8 @@ PHP;
             $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
         }
 
-        $fieldConfTemplate = str_replace('{{VALUES}}', implode(",\n", array_map(function($val){
-            return $val;
+        $fieldConfTemplate = preg_replace('/^\s*\{\{VALUES\}\}/m', implode(",\n", array_map(function($val){
+            return str_repeat(' ', $this->getSpaceCount()).$val;
         }, $values)), $fieldConfTemplate);
 
         return $fieldConfTemplate;
