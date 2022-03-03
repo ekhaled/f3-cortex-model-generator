@@ -307,6 +307,14 @@ PHP;
         return $type;
     }
 
+    protected function getSpaceCount()
+    {
+      preg_match('/^\s*\{\{VALUES\}\}/m', $this->_fieldconf_template, $match);
+      if(!empty($match)){
+        return strlen($match[0]) - strlen(ltrim($match[0]));
+      }
+    }
+
     protected function output($msg, $err = false){
         if($err){
             echo "\033[1;97;41m" .$msg."\e[0m" . "\n";
