@@ -212,9 +212,9 @@ PHP;
 
         $fieldConfTemplate = $this->getFieldConfTemplate();
 
-        $fieldConfTemplate = preg_replace(
-          $FIELDNAME,
-          $this->getIndentation('FIELDNAME').'\''.$field['name'].'\'',
+        $fieldConfTemplate = str_replace(
+          "{{FIELDNAME}}",
+          '\''.$field['name'].'\'',
           $fieldConfTemplate
         );
 
