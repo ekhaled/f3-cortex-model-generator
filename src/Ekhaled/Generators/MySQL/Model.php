@@ -186,8 +186,8 @@ PHP;
                 $this->_fieldconf_template = file_get_contents($this->config['fieldconf_template']);
             } else {
                 $this->_fieldconf_template = <<<PHP
-'{{FIELDNAME}}' => [
-  {{VALUES}}
+{{FIELDNAME}} => [
+  {{KEY}} => {{VALUE}}
 ],
 PHP;
             }
@@ -207,8 +207,18 @@ PHP;
     }
 
     protected function field(array $field, $relationNamespace = ''){
+        // place holders
+        $FIELDNAME = "/^\s*\{\{FIELDNAME\}\}/m";
+        $KEY = "/^\s*\{\{KEY\}\}/m";
+        $VALUE = "/^\s*\{\{VALUE\}\}/m";
+
         $fieldConfTemplate = $this->getFieldConfTemplate();
-        $fieldConfTemplate = str_replace('{{FIELDNAME}}', $field['name'], $fieldConfTemplate);
+
+        $fieldConfTemplate = preg_replace(
+          $FIELDNAME,
+          $this->getIndentation('FIELDNAME').'\''.$field['name'].'\'',
+          $fieldConfTemplate
+        );
 
         $values = [];
 
