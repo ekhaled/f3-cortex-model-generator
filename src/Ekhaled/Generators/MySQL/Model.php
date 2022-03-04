@@ -226,7 +226,7 @@ PHP;
         }
 
         $fieldConfTemplate = preg_replace('/^\s*\{\{VALUES\}\}/m', implode(",\n", array_map(function($val){
-            return str_repeat(' ', $this->getSpaceCount()).$val;
+            return $this->getIndentation('VALUES').$val;
         }, $values)), $fieldConfTemplate);
 
         return $fieldConfTemplate;
@@ -307,12 +307,13 @@ PHP;
         return $type;
     }
 
-    protected function getSpaceCount()
+    protected function getIndentation($placeholder)
     {
-      preg_match('/^\s*\{\{VALUES\}\}/m', $this->_fieldconf_template, $match);
+      preg_match("/^\s*\{\{$placeholder\}\}/m", $this->_fieldconf_template, $match);
       if(!empty($match)){
-        return strlen($match[0]) - strlen(ltrim($match[0]));
+        return str_repeat(' ', strlen($match[0]) - strlen(ltrim($match[0])));
       }
+      return '';
     }
 
     protected function output($msg, $err = false){
