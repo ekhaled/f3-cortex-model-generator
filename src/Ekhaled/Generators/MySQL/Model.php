@@ -249,10 +249,9 @@ PHP;
         }
 
 
-        $fieldConfTemplate = preg_replace($OPTIONS_PATT, implode("\n", array_map(function($val){
+        $fieldConfTemplate = preg_replace($OPTIONS_PATT, implode(",\n", array_map(function($val){
             return $val;
-        }, $options)), $fieldConfTemplate);
-
+        }, str_replace(array("\n\r", "\n", "\r"), "", $options))), $fieldConfTemplate);
 
         return $fieldConfTemplate;
     }
