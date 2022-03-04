@@ -188,7 +188,7 @@ PHP;
                 $this->_fieldconf_template = <<<PHP
 {{FIELDNAME}} => [
   {{KEY}} => {{VALUE}}
-],
+]
 PHP;
             }
         }
