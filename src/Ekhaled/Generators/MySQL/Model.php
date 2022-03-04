@@ -207,10 +207,8 @@ PHP;
     }
 
     protected function field(array $field, $relationNamespace = ''){
-        // place holders
-        $FIELDNAME = "/^\s*\{\{FIELDNAME\}\}/m";
-        $KEY = "/^\s*\{\{KEY\}\}/m";
-        $VALUE = "/^\s*\{\{VALUE\}\}/m";
+
+        $OPTIONS_PATT = "/^\s*\{\{KEY\}\}.*$/m";
 
         $fieldConfTemplate = $this->getFieldConfTemplate();
 
