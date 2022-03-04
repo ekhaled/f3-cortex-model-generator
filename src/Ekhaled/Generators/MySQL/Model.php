@@ -221,13 +221,13 @@ PHP;
         $values = [];
 
         if(isset($field['relation']) && count($field['relation']) > 0){
-            $values[] = '\''.$field['relation']['type'].'\' => \''.$this->className($field['relation']['table'], $relationNamespace).'\'';
+            $values['\''.$field['relation']['type'].'\''] = '\''.$this->className($field['relation']['table'], $relationNamespace).'\'';
         }else{
 
-            $values[] = '\'type\' => \''.$this->extractType($field['type']).'\'';
+            $values['\'type\''] = '\''.$this->extractType($field['type']).'\'';
 
             if (trim($field['default']) !== '') {
-                $values[] = '\'default\' => \'' . $field['default'] . '\'';
+                $values['\'default\''] = '\''.$field['default'] . '\'';
             }
 
             $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
