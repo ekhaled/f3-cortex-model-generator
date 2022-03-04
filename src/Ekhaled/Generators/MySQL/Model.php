@@ -147,7 +147,7 @@ Please ensure database connection settings are correct.", true);
         }
 
         $modelTemplate = str_replace(array_keys($data), array_values($data), $modelTemplate);
-        $modelTemplate = str_replace('{{FIELDCONF}}', implode("\n", $fieldConf), $modelTemplate);
+        $modelTemplate = str_replace('{{FIELDCONF}}', implode(",\n", $fieldConf), $modelTemplate);
 
         return $modelTemplate;
 
@@ -248,9 +248,11 @@ PHP;
           }
         }
 
-        $fieldConfTemplate = preg_replace('/^\s*\{\{VALUES\}\}/m', implode(",\n", array_map(function($val){
-            return $this->getIndentation('VALUES').$val;
-        }, $values)), $fieldConfTemplate);
+
+        $fieldConfTemplate = preg_replace($OPTIONS_PATT, implode("\n", array_map(function($val){
+            return $val;
+        }, $options)), $fieldConfTemplate);
+
 
         return $fieldConfTemplate;
     }
