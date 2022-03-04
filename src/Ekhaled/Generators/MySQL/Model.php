@@ -230,7 +230,22 @@ PHP;
                 $values['\'default\''] = '\''.$field['default'] . '\'';
             }
 
-            $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
+            $values['\'nullable\''] = ($field['nullable'] ? 'true' : 'false');
+        }
+
+
+
+        preg_match($OPTIONS_PATT, $fieldConfTemplate, $match);
+
+        $options = [];
+
+        if(!empty($match) && !empty($values)){
+          foreach ($values as $key => $value) {
+            $temp = $match[0];
+            $temp = str_replace("{{KEY}}", $key, $temp);
+            $temp = str_replace("{{VALUE}}", $value, $temp);
+            $options[] = $temp;
+          }
         }
 
         $fieldConfTemplate = preg_replace('/^\s*\{\{VALUES\}\}/m', implode(",\n", array_map(function($val){
