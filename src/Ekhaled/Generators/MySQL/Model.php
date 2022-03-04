@@ -147,7 +147,7 @@ Please ensure database connection settings are correct.", true);
         }
 
         $modelTemplate = str_replace(array_keys($data), array_values($data), $modelTemplate);
-        $modelTemplate = str_replace('{{FIELDCONF}}', implode("", $fieldConf), $modelTemplate);
+        $modelTemplate = str_replace('{{FIELDCONF}}', implode("\n", $fieldConf), $modelTemplate);
 
         return $modelTemplate;
 
