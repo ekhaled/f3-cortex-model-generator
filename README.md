@@ -40,8 +40,8 @@ and, just run the file from the command line.
  - `extends` - if you have a base model, you can make the generated model extend that model by specifying it here.
  - `relationNamespace` - Namespace of the connected classes that constitute relationships with a given model, usually it's the same as `namespace`
  - `template` - Path to file containing a custom template, if not specified a built-in template will be used.
- - `indentation` - an array that indicates what type of  unit of indentation to be used on template generation followed by a starting level.
-For example: array('unit' => '   ', 'start_level' => 3).  This will use 2 spaces as indentation starting at 6 spaces
+ - `indentation` - an array that indicates what type of  unit of indentation to be used on template generation followed by a starting level.  
+For example: `['unit' => '   ', 'start_level' => 3]`.  This will use 2 spaces as indentation starting at 6 spaces.  
 This is applied to the array defined by the {{FIELDCONF}} template
  - `exclude_views` - Whether to generate models for Views too, defaults to _false_.
  - `exclude_connectors` - Whether to generate stub models for many-to-many connector tables, defaults to _false_. (Sometimes you might need these models to create db tables, for example for automated tests in test databases).
