@@ -190,11 +190,11 @@ PHP;
 
     protected function field(array $field, $relationNamespace = '')
     {
-        $fieldConfig = $this->getfieldConfigIndent();
+        $indentConfig = $this->getfieldConfigIndent();
 
-        $template = $fieldConfig['field_name_indent'] . '\'' . $field['name'] . '\' => [
+        $template = $indentConfig['field_name_indent'] . '\'' . $field['name'] . '\' => [
 {{VALUES}}
-' . $fieldConfig['field_name_indent'] . ']';
+' . $indentConfig['field_name_indent'] . ']';
 
         $values = [];
 
@@ -211,8 +211,8 @@ PHP;
             $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
         }
 
-        $template = str_replace('{{VALUES}}', implode(",\n", array_map(function ($val) use ($fieldConfig) {
-            return $fieldConfig['values_indent'] . $val;
+        $template = str_replace('{{VALUES}}', implode(",\n", array_map(function ($val) use ($indentConfig) {
+            return $indentConfig['values_indent'] . $val;
         }, $values)), $template);
 
         return $template;
@@ -220,15 +220,15 @@ PHP;
 
     protected function virtualfield(array $relation, $relationNamespace = '')
     {
-        $fieldConfig = $this->getfieldConfigIndent();
+        $indentConfig = $this->getfieldConfigIndent();
         if (isset($relation['via'])) {
-            return $fieldConfig['field_name_indent'] . '\'' . $relation['selfColumn'] . '\' => [
-' . $fieldConfig['values_indent'] . '\'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\', \'' . $relation['via'] . '\']
-' . $fieldConfig['field_name_indent'] . ']';
+            return $indentConfig['field_name_indent'] . '\'' . $relation['selfColumn'] . '\' => [
+' . $indentConfig['values_indent'] . '\'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\', \'' . $relation['via'] . '\']
+' . $indentConfig['field_name_indent'] . ']';
         } else {
-            return $fieldConfig['field_name_indent'] . '\'' . (isset($relation['key']) ? $relation['key'] : $relation['table']) . '\' => [
-' . $fieldConfig['values_indent'] . '\'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\']
-' . $fieldConfig['field_name_indent'] . ']';
+            return $indentConfig['field_name_indent'] . '\'' . (isset($relation['key']) ? $relation['key'] : $relation['table']) . '\' => [
+' . $indentConfig['values_indent'] . '\'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\']
+' . $indentConfig['field_name_indent'] . ']';
         }
     }
 
