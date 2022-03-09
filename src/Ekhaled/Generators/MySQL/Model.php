@@ -7,7 +7,6 @@ use \PDOException;
 class Model{
 
     private $_template;
-    private $_fieldconf_template;
 
     protected $config = array();
 
@@ -20,7 +19,6 @@ class Model{
             'extends'               => '\\Models\\Base',
             'relationNamespace'     => '\\Models\Base\\',
             'template'              => '',
-            'fieldconf_template'    => '',
             'exclude_views'         => false,
             'exclude_connectors'    => true,
             'exclude'               => array()
@@ -179,23 +177,6 @@ PHP;
         return $this->_template;
     }
 
-    protected function getFieldConfTemplate()
-    {
-        if (empty($this->_fieldconf_template)) {
-            if (!empty($this->config['fieldconf_template'])) {
-                $this->_fieldconf_template = file_get_contents($this->config['fieldconf_template']);
-            } else {
-                $this->_fieldconf_template = <<<PHP
-{{FIELDNAME}} => [
-  {{KEY}} => {{VALUE}}
-]
-PHP;
-            }
-        }
-
-        return $this->_fieldconf_template;
-    }
-
     protected function getSchema()
     {
         $schemaParser = new \Ekhaled\MysqlSchema\Parser($this->config['DB']);
@@ -207,53 +188,30 @@ PHP;
     }
 
     protected function field(array $field, $relationNamespace = ''){
-
-        $OPTIONS_PATT = "/^\s*\{\{KEY\}\}.*$/m";
-
-        $fieldConfTemplate = $this->getFieldConfTemplate();
-
-        $fieldConfTemplate = str_replace(
-          "{{FIELDNAME}}",
-          '\''.$field['name'].'\'',
-          $fieldConfTemplate
-        );
+        $template = '        \''.$field['name'].'\' => [
+{{VALUES}}
+        ]';
 
         $values = [];
 
         if(isset($field['relation']) && count($field['relation']) > 0){
-            $values['\''.$field['relation']['type'].'\''] = '\''.$this->className($field['relation']['table'], $relationNamespace).'\'';
+            $values[] = '\''.$field['relation']['type'].'\' => \''.$this->className($field['relation']['table'], $relationNamespace).'\'';
         }else{
 
-            $values['\'type\''] = '\''.$this->extractType($field['type']).'\'';
+            $values[] = '\'type\' => \''.$this->extractType($field['type']).'\'';
 
             if (trim($field['default']) !== '') {
-                $values['\'default\''] = '\''.$field['default'] . '\'';
+                $values[] = '\'default\' => \'' . $field['default'] . '\'';
             }
 
-            $values['\'nullable\''] = ($field['nullable'] ? 'true' : 'false');
+            $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
         }
 
+        $template = str_replace('{{VALUES}}', implode(",\n", array_map(function($val){
+            return '            '.$val;
+        }, $values)), $template);
 
-
-        preg_match($OPTIONS_PATT, $fieldConfTemplate, $match);
-
-        $options = [];
-
-        if(!empty($match) && !empty($values)){
-          foreach ($values as $key => $value) {
-            $temp = $match[0];
-            $temp = str_replace("{{KEY}}", $key, $temp);
-            $temp = str_replace("{{VALUE}}", $value, $temp);
-            $options[] = $temp;
-          }
-        }
-
-
-        $fieldConfTemplate = preg_replace($OPTIONS_PATT, implode(",\n", array_map(function($val){
-            return $val;
-        }, str_replace(array("\n\r", "\n", "\r"), "", $options))), $fieldConfTemplate);
-
-        return $fieldConfTemplate;
+        return $template;
     }
 
     protected function virtualfield(array $relation, $relationNamespace = ''){
@@ -329,15 +287,6 @@ PHP;
         }
 
         return $type;
-    }
-
-    protected function getIndentation($placeholder)
-    {
-      preg_match("/^\s*\{\{$placeholder\}\}/m", $this->_fieldconf_template, $match);
-      if(!empty($match)){
-        return str_repeat(' ', strlen($match[0]) - strlen(ltrim($match[0])));
-      }
-      return '';
     }
 
     protected function output($msg, $err = false){
