@@ -190,9 +190,11 @@ PHP;
 
   protected function field(array $field, $relationNamespace = '')
   {
-    $template = '        \'' . $field['name'] . '\' => [
+    $fieldConfig = $this->getfieldConfigIndent();
+
+    $template = $fieldConfig['field_name_indent'] . '\'' . $field['name'] . '\' => [
 {{VALUES}}
-        ]';
+' . $fieldConfig['field_name_indent'] . ']';
 
     $values = [];
 
@@ -209,8 +211,8 @@ PHP;
       $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
     }
 
-    $template = str_replace('{{VALUES}}', implode(",\n", array_map(function ($val) {
-      return '            ' . $val;
+    $template = str_replace('{{VALUES}}', implode(",\n", array_map(function ($val) use ($fieldConfig) {
+      return $fieldConfig['values_indent'] . $val;
     }, $values)), $template);
 
     return $template;
