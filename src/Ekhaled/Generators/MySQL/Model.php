@@ -298,13 +298,13 @@ PHP;
   protected function getfieldConfigIndent()
   {
     $fieldConfig = $this->config['fieldconf'];
-    $indent_start = isset($fieldConfig['indent_start_level']) ? $fieldConfig['indent_start_level'] : 0;
-    $indent = isset($fieldConfig['indent']) ? $fieldConfig['indent'] : 0;
+    $indent_start = isset($fieldConfig['indent_start_level']) ? $fieldConfig['indent_start_level'] : 2;
+    $indent = isset($fieldConfig['indent']) ? $fieldConfig['indent'] : 2;
     $types = [
       'tab' => "\t",
       'space' => ' '
     ];
-    $indent_type = isset($fieldConfig['indent_type']) ? $fieldConfig['indent_type'] : '';
+    $indent_type = isset($fieldConfig['indent_type']) ? $fieldConfig['indent_type'] : 'space';
 
 
     $fieldNameIndent = str_repeat($types[$indent_type], $indent_start);
