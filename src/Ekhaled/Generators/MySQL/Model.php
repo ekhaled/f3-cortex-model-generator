@@ -21,7 +21,7 @@ class Model
             'extends'               => '\\Models\\Base',
             'relationNamespace'     => '\\Models\Base\\',
             'template'              => '',
-            'fieldconf'             => array(),
+            'indentation'           => array(),
             'exclude_views'         => false,
             'exclude_connectors'    => true,
             'exclude'               => array()
@@ -190,7 +190,7 @@ PHP;
 
     protected function field(array $field, $relationNamespace = '')
     {
-        $indentConfig = $this->getfieldConfigIndent();
+        $indentConfig = $this->getIndentationConfig();
 
         $template = $indentConfig['field_name_indent'] . '\'' . $field['name'] . '\' => [
 {{VALUES}}
@@ -220,7 +220,7 @@ PHP;
 
     protected function virtualfield(array $relation, $relationNamespace = '')
     {
-        $indentConfig = $this->getfieldConfigIndent();
+        $indentConfig = $this->getIndentationConfig();
         if (isset($relation['via'])) {
             return $indentConfig['field_name_indent'] . '\'' . $relation['selfColumn'] . '\' => [
 ' . $indentConfig['values_indent'] . '\'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\', \'' . $relation['via'] . '\']
@@ -295,20 +295,15 @@ PHP;
         return $type;
     }
 
-    protected function getfieldConfigIndent()
+    protected function getIndentationConfig()
     {
-        $fieldConfig = $this->config['fieldconf'];
-        $indent_start = isset($fieldConfig['indent_start_level']) ? $fieldConfig['indent_start_level'] : 2;
-        $indent = isset($fieldConfig['indent']) ? $fieldConfig['indent'] : 2;
-        $types = [
-            'tab' => "\t",
-            'space' => ' '
-        ];
-        $indent_type = isset($fieldConfig['indent_type']) ? $fieldConfig['indent_type'] : 'space';
+        $indentation = $this->config['indentation'];
+        $start_level = isset($indentation['start_level']) ? $indentation['start_level'] : 3;
+        $unit = isset($indentation['unit']) ? $indentation['unit'] : '  ';
 
 
-        $fieldNameIndent = str_repeat($types[$indent_type], $indent_start);
-        $valuesIndent = $fieldNameIndent . str_repeat($types[$indent_type], $indent);
+        $fieldNameIndent = str_repeat($unit, $start_level);
+        $valuesIndent = $fieldNameIndent . $unit;
 
         return [
             'field_name_indent' => $fieldNameIndent,
