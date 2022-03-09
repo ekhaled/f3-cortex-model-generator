@@ -23,7 +23,7 @@ class Model
             'template'              => '',
             'indentation'           => array(),
             'exclude_views'         => false,
-            'exclude_connectors'    => true,
+            'exclude_connectors'    => false,
             'exclude'               => array()
         );
 
