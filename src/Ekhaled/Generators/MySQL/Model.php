@@ -292,6 +292,27 @@ PHP;
     return $type;
   }
 
+  protected function getfieldConfigIndent()
+  {
+    $fieldConfig = $this->config['fieldconf'];
+    $indent_start = isset($fieldConfig['indent_start_level']) ? $fieldConfig['indent_start_level'] : 0;
+    $indent = isset($fieldConfig['indent']) ? $fieldConfig['indent'] : 0;
+    $types = [
+      'tab' => "\t",
+      'space' => ' '
+    ];
+    $indent_type = isset($fieldConfig['indent_type']) ? $fieldConfig['indent_type'] : '';
+
+
+    $fieldNameIndent = str_repeat($types[$indent_type], $indent_start);
+    $valuesIndent = $fieldNameIndent . str_repeat($types[$indent_type], $indent);
+
+    return [
+      'field_name_indent' => $fieldNameIndent,
+      'values_indent' => $valuesIndent
+    ];
+  }
+
   protected function output($msg, $err = false)
   {
     if ($err) {
