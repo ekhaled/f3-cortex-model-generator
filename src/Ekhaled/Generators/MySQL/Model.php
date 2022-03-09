@@ -220,14 +220,15 @@ PHP;
 
   protected function virtualfield(array $relation, $relationNamespace = '')
   {
+    $fieldConfig = $this->getfieldConfigIndent();
     if (isset($relation['via'])) {
-      return '        \'' . $relation['selfColumn'] . '\' => [
+      return $fieldConfig['field_name_indent'] . '\'' . $relation['selfColumn'] . '\' => [
                 \'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\', \'' . $relation['via'] . '\']
-            ]';
+' . $fieldConfig['field_name_indent'] . ']';
     } else {
-      return '        \'' . (isset($relation['key']) ? $relation['key'] : $relation['table']) . '\' => [
+      return $fieldConfig['field_name_indent'] . '\'' . (isset($relation['key']) ? $relation['key'] : $relation['table']) . '\' => [
             \'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\']
-        ]';
+' . $fieldConfig['field_name_indent'] . ']';
     }
   }
 
