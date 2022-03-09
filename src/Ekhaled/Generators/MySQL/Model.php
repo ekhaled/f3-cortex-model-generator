@@ -1,10 +1,12 @@
 <?php
+
 namespace Ekhaled\Generators\MySQL;
 
 use \RuntimeException;
 use \PDOException;
 
-class Model{
+class Model
+{
 
     private $_template;
 
@@ -19,8 +21,9 @@ class Model{
             'extends'               => '\\Models\\Base',
             'relationNamespace'     => '\\Models\Base\\',
             'template'              => '',
+            'indentation'           => array(),
             'exclude_views'         => false,
-            'exclude_connectors'    => true,
+            'exclude_connectors'    => false,
             'exclude'               => array()
         );
 
@@ -35,21 +38,20 @@ class Model{
         $this->config = $defaults;
 
         clearstatcache();
-        try{
+        try {
             $this->checkConditions();
-        }catch(RuntimeException $ex){
+        } catch (RuntimeException $ex) {
             $message = $ex->getMessage();
             $this->output($message, true);
             exit;
         }
-
     }
 
     public function generate()
     {
-        try{
+        try {
             $schema = $this->getSchema();
-        }catch(PDOException $ex){
+        } catch (PDOException $ex) {
             $message = $ex->getMessage();
             $this->output("Database connection failed with the message
 >> \"" . $message . "\"
@@ -59,32 +61,31 @@ Please ensure database connection settings are correct.", true);
 
         $config = $this->config;
 
-        foreach($schema as $table){
-            if(!in_array($table['name'], $config['exclude'])){
-                if($config['exclude_views'] && $table['type'] == 'VIEW'){
+        foreach ($schema as $table) {
+            if (!in_array($table['name'], $config['exclude'])) {
+                if ($config['exclude_views'] && $table['type'] == 'VIEW') {
                     continue;
                 }
-                if($config['exclude_connectors'] && $table['is_connector_table']){
+                if ($config['exclude_connectors'] && $table['is_connector_table']) {
                     continue;
                 }
                 $className = $this->className($table['name']);
-                $h = fopen($config['output'].$className.'.php' , 'w');
-                if(fwrite($h, $this->generateModel(
+                $h = fopen($config['output'] . $className . '.php', 'w');
+                if (fwrite($h, $this->generateModel(
                     $table,
                     $config['namespace'],
                     $config['extends'],
                     $config['relationNamespace']
-                ))){
-                    $this->output("Generated " .$className." model");
-                }else{
-                    $this->output('Failed to generate '.$className.' model', true);
+                ))) {
+                    $this->output("Generated " . $className . " model");
+                } else {
+                    $this->output('Failed to generate ' . $className . ' model', true);
                 }
 
                 fclose($h);
                 usleep(250000);
             }
         }
-
     }
 
     protected function checkConditions()
@@ -106,7 +107,7 @@ Please ensure database connection settings are correct.", true);
         }
     }
 
-    protected function generateModel($schema, $namespace = null, $extends = null, $relationNamespace = '',$classname = null)
+    protected function generateModel($schema, $namespace = null, $extends = null, $relationNamespace = '', $classname = null)
     {
         $modelTemplate = $this->getTemplate();
 
@@ -119,28 +120,28 @@ Please ensure database connection settings are correct.", true);
             '{{TABLENAME}}' => $tablename,
         ];
 
-        if($namespace){
-            $data['{{NAMESPACE}}'] = 'namespace '.$namespace.';';
+        if ($namespace) {
+            $data['{{NAMESPACE}}'] = 'namespace ' . $namespace . ';';
         }
 
-        if($extends){
-            $data['{{EXTENDS}}'] = 'extends '.$extends;
+        if ($extends) {
+            $data['{{EXTENDS}}'] = 'extends ' . $extends;
         }
 
-        if(!$classname){
+        if (!$classname) {
             $classname = $this->className($tablename);
         }
 
         $data['{{CLASSNAME}}'] = $classname;
 
         $fieldConf = [];
-        foreach($schema['columns'] as $column){
-            if(!($column['isPrimaryKey'] && $column['autoIncrement'])){
+        foreach ($schema['columns'] as $column) {
+            if (!($column['isPrimaryKey'] && $column['autoIncrement'])) {
                 $fieldConf[] = $this->field($column, $relationNamespace);
             }
         }
 
-        foreach($schema['relations'] as $rel){
+        foreach ($schema['relations'] as $rel) {
             $fieldConf[] = $this->virtualfield($rel, $relationNamespace);
         }
 
@@ -148,7 +149,6 @@ Please ensure database connection settings are correct.", true);
         $modelTemplate = str_replace('{{FIELDCONF}}', implode(",\n", $fieldConf), $modelTemplate);
 
         return $modelTemplate;
-
     }
 
     protected function getTemplate()
@@ -183,22 +183,26 @@ PHP;
         return $schemaParser->getSchema();
     }
 
-    protected function className($t, $ns = ''){
-        return $ns.ucfirst(strtolower($t));
+    protected function className($t, $ns = '')
+    {
+        return $ns . ucfirst(strtolower($t));
     }
 
-    protected function field(array $field, $relationNamespace = ''){
-        $template = '        \''.$field['name'].'\' => [
+    protected function field(array $field, $relationNamespace = '')
+    {
+        $indentConfig = $this->getIndentationConfig();
+
+        $template = $indentConfig['field_name_indent'] . '\'' . $field['name'] . '\' => [
 {{VALUES}}
-        ]';
+' . $indentConfig['field_name_indent'] . ']';
 
         $values = [];
 
-        if(isset($field['relation']) && count($field['relation']) > 0){
-            $values[] = '\''.$field['relation']['type'].'\' => \''.$this->className($field['relation']['table'], $relationNamespace).'\'';
-        }else{
+        if (isset($field['relation']) && count($field['relation']) > 0) {
+            $values[] = '\'' . $field['relation']['type'] . '\' => \'' . $this->className($field['relation']['table'], $relationNamespace) . '\'';
+        } else {
 
-            $values[] = '\'type\' => \''.$this->extractType($field['type']).'\'';
+            $values[] = '\'type\' => \'' . $this->extractType($field['type']) . '\'';
 
             if (trim($field['default']) !== '') {
                 $values[] = '\'default\' => \'' . $field['default'] . '\'';
@@ -207,27 +211,29 @@ PHP;
             $values[] = '\'nullable\' => ' . ($field['nullable'] ? 'true' : 'false');
         }
 
-        $template = str_replace('{{VALUES}}', implode(",\n", array_map(function($val){
-            return '            '.$val;
+        $template = str_replace('{{VALUES}}', implode(",\n", array_map(function ($val) use ($indentConfig) {
+            return $indentConfig['values_indent'] . $val;
         }, $values)), $template);
 
         return $template;
     }
 
-    protected function virtualfield(array $relation, $relationNamespace = ''){
-        if(isset($relation['via'])){
-            return '        \''.$relation['selfColumn'].'\' => [
-                \''.$relation['type'].'\' => [\''.$this->className($relation['table'], $relationNamespace).'\', \''.$relation['column'].'\', \''.$relation['via'].'\']
-            ]';
-        }else{
-            return '        \''.(isset($relation['key']) ? $relation['key'] : $relation['table']).'\' => [
-            \''.$relation['type'].'\' => [\''.$this->className($relation['table'], $relationNamespace).'\', \''.$relation['column'].'\']
-        ]';
+    protected function virtualfield(array $relation, $relationNamespace = '')
+    {
+        $indentConfig = $this->getIndentationConfig();
+        if (isset($relation['via'])) {
+            return $indentConfig['field_name_indent'] . '\'' . $relation['selfColumn'] . '\' => [
+' . $indentConfig['values_indent'] . '\'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\', \'' . $relation['via'] . '\']
+' . $indentConfig['field_name_indent'] . ']';
+        } else {
+            return $indentConfig['field_name_indent'] . '\'' . (isset($relation['key']) ? $relation['key'] : $relation['table']) . '\' => [
+' . $indentConfig['values_indent'] . '\'' . $relation['type'] . '\' => [\'' . $this->className($relation['table'], $relationNamespace) . '\', \'' . $relation['column'] . '\']
+' . $indentConfig['field_name_indent'] . ']';
         }
-
     }
 
-    protected function extractType($dbType){
+    protected function extractType($dbType)
+    {
 
         $ints = [
             1 => 1,
@@ -246,42 +252,42 @@ PHP;
         $varchars = [128, 256, 512];
 
         $size = null;
-        if(strpos($dbType,'(') && preg_match('/\((.*)\)/',$dbType,$matches)){
-            $values = explode(',',$matches[1]);
+        if (strpos($dbType, '(') && preg_match('/\((.*)\)/', $dbType, $matches)) {
+            $values = explode(',', $matches[1]);
             $size = $values[0];
         }
 
-        if(stripos($dbType,'tinyint')!==false)
+        if (stripos($dbType, 'tinyint') !== false)
             $type = 'INT1';
-        elseif(stripos($dbType,'int')!==false && stripos($dbType,'unsigned int')===false)
+        elseif (stripos($dbType, 'int') !== false && stripos($dbType, 'unsigned int') === false)
             $type = 'INT';
-        elseif(stripos($dbType,'longtext')!==false)
+        elseif (stripos($dbType, 'longtext') !== false)
             $type = 'LONGTEXT';
-        elseif(stripos($dbType,'text')!==false)
+        elseif (stripos($dbType, 'text') !== false)
             $type = 'TEXT';
-        elseif(stripos($dbType,'bool')!==false)
+        elseif (stripos($dbType, 'bool') !== false)
             $type = 'BOOLEAN';
-        elseif(stripos($dbType,'datetime')!==false)
+        elseif (stripos($dbType, 'datetime') !== false)
             $type = 'DATETIME';
-        elseif(stripos($dbType,'date')!==false)
+        elseif (stripos($dbType, 'date') !== false)
             $type = 'DATE';
-        elseif(stripos($dbType,'timestamp')!==false)
+        elseif (stripos($dbType, 'timestamp') !== false)
             $type = 'TIMESTAMP';
-        elseif(preg_match('/(real|floa|doub)/i',$dbType))
+        elseif (preg_match('/(real|floa|doub)/i', $dbType))
             $type = 'DOUBLE';
         else
             $type = 'VARCHAR';
 
-        if($type == 'VARCHAR' && in_array($size, $varchars)){
+        if ($type == 'VARCHAR' && in_array($size, $varchars)) {
             return $type . $size;
-        }elseif($type == 'VARCHAR'){
+        } elseif ($type == 'VARCHAR') {
             return 'VARCHAR128';
         }
 
-        if($type == 'INT'){
-            if(in_array($size, array_keys($ints))){
+        if ($type == 'INT') {
+            if (in_array($size, array_keys($ints))) {
                 return $type . $ints[$size];
-            }else{
+            } else {
                 return $type . '8';
             }
         }
@@ -289,11 +295,28 @@ PHP;
         return $type;
     }
 
-    protected function output($msg, $err = false){
-        if($err){
-            echo "\033[1;97;41m" .$msg."\e[0m" . "\n";
-        }else{
-            echo "\033[1;97;42m" .$msg."\e[0m" . "\n";
+    protected function getIndentationConfig()
+    {
+        $indentation = $this->config['indentation'];
+        $start_level = isset($indentation['start_level']) ? $indentation['start_level'] : 3;
+        $unit = isset($indentation['unit']) ? $indentation['unit'] : '  ';
+
+
+        $fieldNameIndent = str_repeat($unit, $start_level);
+        $valuesIndent = $fieldNameIndent . $unit;
+
+        return [
+            'field_name_indent' => $fieldNameIndent,
+            'values_indent' => $valuesIndent
+        ];
+    }
+
+    protected function output($msg, $err = false)
+    {
+        if ($err) {
+            echo "\033[1;97;41m" . $msg . "\e[0m" . "\n";
+        } else {
+            echo "\033[1;97;42m" . $msg . "\e[0m" . "\n";
         }
     }
 }
